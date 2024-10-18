@@ -9,6 +9,6 @@ believe this project has the right amount of
 complexity required for this class.
 
 Members:
-1.) Henry Cutright (hjc3cqc)
-2.) Haley Fitch (hnf8bgt)
-3.) Afreen Haq (fwh8du)
+* 1.) Henry Cutright (hjc3cqc)
+* 2.) Haley Fitch (hnf8bgt)
+* 3.) Afreen Haq (fwh8du)
