@@ -5,69 +5,56 @@ from sqlalchemy import text
 
 app = FastAPI()
 
-@app.get("/oldroot", response_class=HTMLResponse)
-async def root_old():
-    return """
-    <html>
-        <body>
-            <h1>Party Planning System</h1>
-            <ul>
-                <li><a href="/venues">View Venues</a></li>
-                <li><a href="/events">View Events</a></li>
-            </ul>
-        </body>
-    </html>
-    """
-
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
-    <html>
-    <head>
-    <style>
-    .loginblock{
-	    background-color: AntiqueWhite;
-	    color: black;
-	    border: 2px solid black;
-	    margin: 10px;
-	    padding: 10px;
-	    text-align: center;
-    }
-    </style>
-    </head>
-	<body>
-		<h1>Party Planning System</h1>
-        	<table style="width:70%">
-            <tr>
-            	<th> Login </th>
-		<th> Sign up </th>
-            <tr>
-            <tr> 
-            	<td> <div class="loginblock">
-			<form action="/login" method="get">
-			<br>
-			<label> Name: </label>
-			<input name="customer_name" type="text"/>
-			<br><br>
-			<label> Email: </label>
-			<input name="customer_email" type="text"/>
-			<br><br><br>
-			<input type="submit" name="loginform" value="Login"/>
-			</form>
-		</div> </td>
-		<td> <div class="loginblock">
-			Hello2
-		</div> </td>
-            </tr>
-            </table>
-	</body>
-    </html>
-    """
+        <html>
+        <head>
+        <style>
+        .loginblock{
+    	    background-color: AntiqueWhite;
+    	    color: black;
+    	    border: 2px solid black;
+    	    margin: 10px;
+    	    padding: 10px;
+    	    text-align: center;
+        }
+        </style>
+        </head>
+    	<body>
+    		<h1>Party Planning System</h1>
+            	<table style="width:70%">
+                <tr>
+                	<th> Login </th>
+    		<th> Sign up </th>
+                <tr>
+                <tr> 
+                	<td> <div class="loginblock">
+    			<form action="/login" method="get">
+    			<br>
+    			<label> Name: </label>
+    			<input name="customer_name" type="text"/>
+    			<br><br>
+    			<label> Email: </label>
+    			<input name="customer_email" type="text"/>
+    			<br><br><br>
+    			<input type="submit" name="loginform" value="Login"/>
+    			</form>
+    		</div> </td>
+    		<td> <div class="loginblock">
+    			Hello2
+    		</div> </td>
+                </tr>
+                </table>
+    	</body>
+        </html>
+        """
 
+'''
 @app.get("/login")
 async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
     return f'{customer_name} is your name, and {customer_email} is your email.'
-
+'''
 @app.get("/venues", response_class=HTMLResponse)
 async def list_venues():
     try:
