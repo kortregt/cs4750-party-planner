@@ -1,5 +1,7 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from database import engine
+from sqlalchemy import text
 
 app = FastAPI()
 
@@ -22,7 +24,20 @@ async def root():
         <body>
             <h1>Party Planning System</h1>
             <p>Welcome to our party planning service!</p>
-            <p>🎉 Site is live! 🎉</p>
+            <p>Site is live!</p>
         </body>
     </html>
     """
+
+@app.get("/test-db")
+async def test_db():
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT version()"))
+            version = result.scalar()
+            return {"status": "success", "version": version}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": str(e)}
+        )
