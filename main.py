@@ -65,10 +65,10 @@ async def root():
     """
 
 
-@app.get("/login", response_class=HTMLResponse)
+@app.get("/login")
 async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
-    return f"""
-    <html> <body> logged in as {customer_name}</body></html>"""
+    return """
+    <html> <body> logged in as ... </body></html>"""
 
 @app.get("/venues", response_class=HTMLResponse)
 async def list_venues():
