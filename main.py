@@ -67,7 +67,7 @@ async def root():
 
 
 
-@app.get("/login", response_class=HTMLResponse)
+@app.get("/login")
 async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
     return """
         <html>
