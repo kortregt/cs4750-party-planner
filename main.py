@@ -52,7 +52,7 @@ async def root():
 			<label> Email: </label>
 			<input name="customer_email" type="text"/>
 			<br><br><br>
-			<input type="submit" name="loginform" value="Login"/>
+			<button type="submit">Submit</button>
 			</form>
 		</div> </td>
 		<td> <div class="loginblock">
