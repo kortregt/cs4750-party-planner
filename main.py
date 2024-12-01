@@ -44,7 +44,7 @@ async def root():
             <tr>
             <tr> 
             	<td> <div class="loginblock">
-			<form action="/login" method="get">
+			<form action="/venues" method="get">
 			<br>
 			<label> Name: </label>
 			<input name="customer_name" type="text"/>
@@ -65,7 +65,7 @@ async def root():
     """
 
 
-
+'''
 
 @app.get("/login")
 async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
@@ -77,6 +77,7 @@ async def login_customer(customer_name: str = Form(...), customer_email: str = F
         </html>
     """.format(customer_name, customer_email)
 
+'''
 
 @app.get("/venues", response_class=HTMLResponse)
 async def list_venues():
