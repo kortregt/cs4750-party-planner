@@ -19,7 +19,7 @@ async def root_old():
     </html>
     """
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
     return """
     <html>
