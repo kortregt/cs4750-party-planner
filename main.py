@@ -64,6 +64,7 @@ async def root():
     </html>
     """
 
+
 @app.get("/login")
 async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
     return f'{customer_name} is your name, and {customer_email} is your email.'
