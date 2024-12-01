@@ -44,7 +44,7 @@ async def root():
             <tr>
             <tr> 
             	<td> <div class="loginblock">
-			<form action="/login" method="get">
+			<form action="/login" method="post">
 			<br>
 			<label> Name: </label>
 			<input name="customer_name" type="text"/>
