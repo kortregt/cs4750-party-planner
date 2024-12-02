@@ -74,6 +74,43 @@ async def events_add(
 ):
     session = SessionLocal()
     try:
+        # Validate venue exists
+        venue_check = text("SELECT 1 FROM venue WHERE venue_id = :venue_id")
+        if not session.execute(venue_check, {"venue_id": venue_id}).scalar():
+            raise HTTPException(status_code=400, detail="Invalid venue ID")
+
+        # Check venue capacity
+        capacity_check = text("""
+            SELECT max_capacity 
+            FROM venue 
+            WHERE venue_id = :venue_id AND max_capacity >= :guests
+        """)
+        if not session.execute(capacity_check, {
+            "venue_id": venue_id,
+            "guests": number_of_guests
+        }).scalar():
+            raise HTTPException(status_code=400, detail="Number of guests exceeds venue capacity")
+
+        # Check for scheduling conflicts
+        conflict_check = text("""
+            SELECT 1 
+            FROM reservation 
+            WHERE venue_id = :venue_id 
+            AND date = :date 
+            AND (
+                (start_time, end_time) OVERLAPS 
+                (:start_time::time, :end_time::time)
+            )
+        """)
+        if session.execute(conflict_check, {
+            "venue_id": venue_id,
+            "date": date,
+            "start_time": start_time,
+            "end_time": end_time
+        }).scalar():
+            raise HTTPException(status_code=400, detail="Time slot conflicts with existing reservation")
+
+        # Insert reservation
         query = text("""
             INSERT INTO reservation (venue_id, date, start_time, end_time, number_of_guests, customer_id)
             VALUES (:venue_id, :date, :start_time, :end_time, :number_of_guests, :customer_id)
@@ -93,12 +130,29 @@ async def events_add(
         )
         booking_id = result.scalar()
         
+        # Add party if type is provided
         if event_type:
-            party_query = text("""
-                INSERT INTO party (booking_id, type)
-                VALUES (:booking_id, :type)
+            # First get the next party_id for this booking
+            party_id_query = text("""
+                SELECT COALESCE(MAX(party_id), 0) + 1 
+                FROM party 
+                WHERE booking_id = :booking_id
             """)
-            session.execute(party_query, {"booking_id": booking_id, "type": event_type})
+            party_id = session.execute(party_id_query, {"booking_id": booking_id}).scalar()
+
+            # Then insert the party
+            party_query = text("""
+                INSERT INTO party (booking_id, party_id, type)
+                VALUES (:booking_id, :party_id, :type)
+            """)
+            session.execute(
+                party_query,
+                {
+                    "booking_id": booking_id,
+                    "party_id": party_id,
+                    "type": event_type
+                }
+            )
         
         session.commit()
         return RedirectResponse(url="/events", status_code=303)
@@ -125,7 +179,8 @@ async def events_edit_form(request: Request, booking_id: int):
                 to_char(r.start_time, 'HH24:MI') as start_time,
                 to_char(r.end_time, 'HH24:MI') as end_time,
                 r.number_of_guests,
-                p.type as event_type
+                p.type as event_type,
+                p.party_id
             FROM reservation r
             LEFT JOIN party p ON r.booking_id = p.booking_id
             WHERE r.booking_id = :booking_id
@@ -169,6 +224,44 @@ async def events_edit(
 ):
     session = SessionLocal()
     try:
+        # Validate venue exists
+        venue_check = text("SELECT 1 FROM venue WHERE venue_id = :venue_id")
+        if not session.execute(venue_check, {"venue_id": venue_id}).scalar():
+            raise HTTPException(status_code=400, detail="Invalid venue ID")
+
+        # Check venue capacity
+        capacity_check = text("""
+            SELECT max_capacity 
+            FROM venue 
+            WHERE venue_id = :venue_id AND max_capacity >= :guests
+        """)
+        if not session.execute(capacity_check, {
+            "venue_id": venue_id,
+            "guests": number_of_guests
+        }).scalar():
+            raise HTTPException(status_code=400, detail="Number of guests exceeds venue capacity")
+
+        # Check for scheduling conflicts (excluding current booking)
+        conflict_check = text("""
+            SELECT 1 
+            FROM reservation 
+            WHERE venue_id = :venue_id 
+            AND date = :date 
+            AND booking_id != :booking_id
+            AND (
+                (start_time, end_time) OVERLAPS 
+                (:start_time::time, :end_time::time)
+            )
+        """)
+        if session.execute(conflict_check, {
+            "venue_id": venue_id,
+            "date": date,
+            "start_time": start_time,
+            "end_time": end_time,
+            "booking_id": booking_id
+        }).scalar():
+            raise HTTPException(status_code=400, detail="Time slot conflicts with existing reservation")
+
         # Update reservation
         query = text("""
             UPDATE reservation
@@ -194,15 +287,52 @@ async def events_edit(
             }
         )
         
-        # Update or insert party type
         if event_type:
-            party_query = text("""
-                INSERT INTO party (booking_id, type)
-                VALUES (:booking_id, :type)
-                ON CONFLICT (booking_id) DO UPDATE
-                SET type = :type
+            # Check if party exists for this booking
+            check_party_query = text("""
+                SELECT party_id FROM party 
+                WHERE booking_id = :booking_id
             """)
-            session.execute(party_query, {"booking_id": booking_id, "type": event_type})
+            party_result = session.execute(check_party_query, {"booking_id": booking_id})
+            existing_party = party_result.fetchone()
+
+            if existing_party:
+                # Update existing party
+                party_query = text("""
+                    UPDATE party 
+                    SET type = :type
+                    WHERE booking_id = :booking_id AND party_id = :party_id
+                """)
+                session.execute(
+                    party_query,
+                    {
+                        "booking_id": booking_id,
+                        "party_id": existing_party.party_id,
+                        "type": event_type
+                    }
+                )
+            else:
+                # Get next party_id for this booking
+                party_id_query = text("""
+                    SELECT COALESCE(MAX(party_id), 0) + 1 
+                    FROM party 
+                    WHERE booking_id = :booking_id
+                """)
+                party_id = session.execute(party_id_query, {"booking_id": booking_id}).scalar()
+
+                # Create new party
+                party_query = text("""
+                    INSERT INTO party (booking_id, party_id, type)
+                    VALUES (:booking_id, :party_id, :type)
+                """)
+                session.execute(
+                    party_query,
+                    {
+                        "booking_id": booking_id,
+                        "party_id": party_id,
+                        "type": event_type
+                    }
+                )
         
         session.commit()
         return RedirectResponse(url="/events", status_code=303)
