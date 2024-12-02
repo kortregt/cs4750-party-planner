@@ -1,30 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Staff Management</h1>
-<button onclick="location.href='/staff/add'">Add New Staff</button>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Wage</th>
-        <th>Actions</th>
-    </tr>
-    {% for emp in staff %}
-    <tr>
-        <td>{{ emp.employee_id }}</td>
-        <td>{{ emp.name }}</td>
-        <td>{{ emp.role }}</td>
-        <td>${{ "%.2f"|format(emp.wage) }}</td>
-        <td>
-            <a href="/staff/{{ emp.employee_id }}/edit">Edit</a>
-            <form style="display: inline;" method="POST" action="/staff/{{ emp.employee_id }}/delete" 
-                  onsubmit="return confirm('Are you sure you want to delete this staff member?');">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+<div class="mb-4">
+    <a href="/staff/add" class="btn btn-primary">Add New Staff</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Wage</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for emp in staff %}
+        <tr>
+            <td>{{ emp.employee_id }}</td>
+            <td>{{ emp.name }}</td>
+            <td>{{ emp.role }}</td>
+            <td>${{ "%.2f"|format(emp.wage) }}</td>
+            <td>
+                <a href="/staff/{{ emp.employee_id }}/edit" class="btn btn-sm btn-primary">Edit</a>
+                <form action="/staff/{{ emp.employee_id }}/delete" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this staff member?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}

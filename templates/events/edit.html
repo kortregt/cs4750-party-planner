@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Event</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="venue_id" class="form-label">Venue</label>
+        <select name="venue_id" id="venue_id" class="form-control" required>
+            {% for venue in venues %}
+            <option value="{{ venue.venue_id }}" {% if venue.venue_id == event.venue_id %}selected{% endif %}>
+                {{ venue.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="customer_id" class="form-label">Customer</label>
+        <select name="customer_id" id="customer_id" class="form-control" required>
+            {% for customer in customers %}
+            <option value="{{ customer.customer_id }}" {% if customer.customer_id == event.customer_id %}selected{% endif %}>
+                {{ customer.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" name="date" id="date" class="form-control" value="{{ event.date }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="start_time" class="form-label">Start Time</label>
+        <input type="time" name="start_time" id="start_time" class="form-control" value="{{ event.start_time }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="end_time" class="form-label">End Time</label>
+        <input type="time" name="end_time" id="end_time" class="form-control" value="{{ event.end_time }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="number_of_guests" class="form-label">Number of Guests</label>
+        <input type="number" name="number_of_guests" id="number_of_guests" class="form-control" value="{{ event.number_of_guests }}" required min="1">
+    </div>
+
+    <div class="mb-3">
+        <label for="event_type" class="form-label">Event Type</label>
+        <select name="event_type" id="event_type" class="form-control" required>
+            <option value="">Select event type</option>
+            <option value="Birthday" {% if event.event_type == 'Birthday' %}selected{% endif %}>Birthday</option>
+            <option value="Wedding" {% if event.event_type == 'Wedding' %}selected{% endif %}>Wedding</option>
+            <option value="Corporate" {% if event.event_type == 'Corporate' %}selected{% endif %}>Corporate</option>
+            <option value="Other" {% if event.event_type == 'Other' %}selected{% endif %}>Other</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Event</button>
+    <a href="/events" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
