@@ -3,6 +3,7 @@ from sqlalchemy import text
 from database import engine
 from typing import Optional
 from datetime import date, time
+from fastapi.responses import HTMLResponse
 
 router = APIRouter()
 
