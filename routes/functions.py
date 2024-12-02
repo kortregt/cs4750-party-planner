@@ -6,23 +6,19 @@ from datetime import date, time
 
 router = APIRouter()
 
-@app.get("/check-conflicts")
+@router.get("/check-conflicts")
 async def check_reservation_conflicts(
     venue_id: int,
-    reservation_date: date,
+    date: date,
     start_time: time,
     end_time: time
 ):
-    query = """
-    SELECT * FROM dbo.ListOverlappingReservations(
-        :venue_id, :reservation_date, :start_time, :end_time
-    )
-    """
+    query = "SELECT * FROM ListOverlappingReservations(:venue_id, :date, :start_time, :end_time)"
     try:
         with engine.connect() as conn:
             result = conn.execute(text(query), {
                 "venue_id": venue_id,
-                "reservation_date": reservation_date,
+                "date": date,
                 "start_time": start_time,
                 "end_time": end_time
             })
@@ -93,7 +89,7 @@ async def list_caterers_for_venue(venue_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/test-functions", response_class=HTMLResponse)
+@router.get("/test-functions", response_class=HTMLResponse)
 async def test_functions_page():
     return """
     <html>
@@ -107,11 +103,30 @@ async def test_functions_page():
             <h2>Check Reservation Conflicts</h2>
             <form action="/check-conflicts" method="get">
                 <input type="hidden" name="venue_id" value="319">
-                <input type="date" name="reservation_date" required>
+                <input type="date" name="date" required>
                 <input type="time" name="start_time" required>
                 <input type="time" name="end_time" required>
                 <button type="submit">Check Conflicts</button>
             </form>
+
+            <h2>Add New Reservation</h2>
+            <form action="/add-reservation" method="post">
+                <div>
+                    <label>Venue ID: <input type="number" name="venue_id" required></label><br>
+                    <label>Date: <input type="date" name="date" required></label><br>
+                    <label>Start Time: <input type="time" name="start_time" required></label><br>
+                    <label>End Time: <input type="time" name="end_time" required></label><br>
+                    <label>Guests: <input type="number" name="number_of_guests" required></label><br>
+                    <label>Organizer ID: <input type="number" name="organizer_id" required></label><br>
+                    <label>Customer ID: <input type="number" name="customer_id" required></label><br>
+                    <label>Caterer ID: <input type="number" name="caterer_id"></label><br>
+                    <label>Add Party: <input type="checkbox" name="add_party"></label><br>
+                    <label>Party Type: <input type="text" name="party_type"></label><br>
+                    <label>Description: <textarea name="party_description"></textarea></label><br>
+                    <button type="submit">Add Reservation</button>
+                </div>
+            </form>
+            <p><a href="/">Back to Home</a></p>
         </body>
     </html>
     """
