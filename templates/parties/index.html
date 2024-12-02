@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Party Details</h1>
+    </div>
+
+    <div class="bg-white shadow-md rounded my-6">
+        <table class="min-w-full">
+            <thead>
+                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Date</th>
+                    <th class="py-3 px-6 text-left">Venue</th>
+                    <th class="py-3 px-6 text-left">Customer</th>
+                    <th class="py-3 px-6 text-left">Type</th>
+                    <th class="py-3 px-6 text-left">Description</th>
+                    <th class="py-3 px-6 text-left">Guests of Honor</th>
+                    <th class="py-3 px-6 text-left">Decorations</th>
+                    <th class="py-3 px-6 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-600 text-sm">
+                {% for party in parties %}
+                <tr class="border-b border-gray-200 hover:bg-gray-100">
+                    <td class="py-3 px-6 text-left">{{ party.date }}</td>
+                    <td class="py-3 px-6 text-left">{{ party.venue_name }}</td>
+                    <td class="py-3 px-6 text-left">{{ party.customer_name }}</td>
+                    <td class="py-3 px-6 text-left">{{ party.type }}</td>
+                    <td class="py-3 px-6 text-left">{{ party.description or '' }}</td>
+                    <td class="py-3 px-6 text-left">{{ party.guests_of_honor or '' }}</td>
+                    <td class="py-3 px-6 text-left">{{ party.decorations or '' }}</td>
+                    <td class="py-3 px-6 text-center">
+                        <div class="flex item-center justify-center">
+                            <a href="/parties/{{ party.booking_id }}/{{ party.party_id }}/edit" 
+                               class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded">
+                                Edit Details
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

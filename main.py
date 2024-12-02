@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from routes import staff, venues, events, functions, customers
+from routes import staff, venues, events, functions, customers, parties
 from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
@@ -11,6 +11,7 @@ app.include_router(venues.router)
 app.include_router(events.router)
 app.include_router(functions.router)
 app.include_router(customers.router)
+app.include_router(parties.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
