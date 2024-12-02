@@ -358,7 +358,7 @@ async def events_delete(request: Request, booking_id: int):
         if party:
             # Delete decorations first
             decorations_query = text("""
-                DELETE FROM party_decoration 
+                DELETE FROM "Party_Decorations" 
                 WHERE booking_id = :booking_id AND party_id = :party_id
             """)
             session.execute(decorations_query, {
@@ -368,7 +368,7 @@ async def events_delete(request: Request, booking_id: int):
             
             # Delete guests of honor
             guests_query = text("""
-                DELETE FROM party_guestofhonor 
+                DELETE FROM "Party_GuestOfHonor" 
                 WHERE booking_id = :booking_id AND party_id = :party_id
             """)
             session.execute(guests_query, {
