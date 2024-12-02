@@ -10,7 +10,7 @@ router = APIRouter()
 def get_all_events():
     session = SessionLocal()
     try:
-        query = """
+        query = text("""
             SELECT 
                 to_char(r.date, 'YYYY-MM-DD') as date,
                 to_char(r.start_time, 'HH24:MI') as start_time,
@@ -22,9 +22,9 @@ def get_all_events():
             JOIN venue v ON r.venue_id = v.venue_id
             LEFT JOIN party p ON r.booking_id = p.booking_id
             JOIN customer c ON r.customer_id = c.customer_id
-        """
-        result = session.execute(text(query))
-        events = [dict(zip(row.keys(), row)) for row in result]
+        """)
+        result = session.execute(query)
+        events = [dict(row._mapping) for row in result]
         return {"events": events}
     finally:
         session.close()
