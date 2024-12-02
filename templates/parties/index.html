@@ -31,10 +31,9 @@
             <td>{{ party.guests_of_honor or 'N/A' }}</td>
             <td>{{ party.decorations or 'N/A' }}</td>
             <td>
-                <a href="/parties/{{ party.booking_id }}/{{ party.party_id }}/edit" class="btn btn-sm btn-primary">Edit</a>
-                <form action="/parties/{{ party.booking_id }}/{{ party.party_id }}/delete" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this party?')">Delete</button>
-                </form>
+                <a href="/parties/{{ party.booking_id }}/{{ party.party_id }}/edit" class="btn btn-primary">Edit</a>
+                <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure you want to delete this party?')) document.getElementById('delete-form-{{ party.party_id }}').submit();">Delete</button>
+                <form id="delete-form-{{ party.party_id }}" action="/parties/{{ party.booking_id }}/{{ party.party_id }}/delete" method="POST" style="display: none;"></form>
             </td>
         </tr>
         {% endfor %}
