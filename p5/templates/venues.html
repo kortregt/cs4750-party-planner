@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Venues</h1>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Cost</th>
+        <th>Capacity</th>
+    </tr>
+    {% for venue in venues %}
+    <tr>
+        <td>{{ venue.name }}</td>
+        <td>{{ venue.location }}</td>
+        <td>${{ venue.cost }}</td>
+        <td>{{ venue.max_capacity }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

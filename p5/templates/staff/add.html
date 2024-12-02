@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Add New Staff</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="role" class="form-label">Role</label>
+        <select class="form-control" id="role" name="role" required>
+            <option value="">Select a role</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Decorator">Decorator</option>
+            <option value="IT">IT</option>
+            <option value="Photography">Photography</option>
+            <option value="Cleaner">Cleaner</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="wage" class="form-label">Wage ($)</label>
+        <input type="number" class="form-control" id="wage" name="wage" step="0.01" min="0" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Staff</button>
+    <a href="/staff" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

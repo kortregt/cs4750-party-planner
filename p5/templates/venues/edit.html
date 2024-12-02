@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Venue</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" name="name" id="name" class="form-control" value="{{ venue.name }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" name="location" id="location" class="form-control" value="{{ venue.location }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="cost" class="form-label">Cost per Hour ($)</label>
+        <input type="number" name="cost" id="cost" class="form-control" step="0.01" min="0" value="{{ venue.cost }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="max_capacity" class="form-label">Maximum Capacity</label>
+        <input type="number" name="max_capacity" id="max_capacity" class="form-control" min="1" value="{{ venue.max_capacity }}" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Venue</button>
+    <a href="/venues" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

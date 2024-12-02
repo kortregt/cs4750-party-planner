@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Events</h1>
+<table border="1">
+    <tr>
+        <th>Date</th>
+        <th>Venue</th>
+        <th>Event Type</th>
+    </tr>
+    {% for event in events %}
+    <tr>
+        <td>{{ event.date }}</td>
+        <td>{{ event.venue }}</td>
+        <td>{{ event.event_type or 'N/A' }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

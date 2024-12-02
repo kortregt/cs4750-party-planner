@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Venue Availability Check</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Checking availability for:</h5>
+        <p class="card-text">
+            <strong>Date:</strong> {{ check_date }}<br>
+            <strong>Time:</strong> {{ start_time }} - {{ end_time }}
+        </p>
+    </div>
+</div>
+
+{% if conflicts %}
+<div class="alert alert-warning">
+    <h4 class="alert-heading">Conflicts Found</h4>
+    <p>The following events are scheduled during this time:</p>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Customer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for conflict in conflicts %}
+            <tr>
+                <td>{{ conflict.date }}</td>
+                <td>{{ conflict.start_time }}</td>
+                <td>{{ conflict.end_time }}</td>
+                <td>{{ conflict.customer_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-success">
+    <h4 class="alert-heading">Venue Available!</h4>
+    <p>This venue is available during the requested time slot.</p>
+</div>
+{% endif %}
+
+<a href="/venues" class="btn btn-primary">Back to Venues</a>
+{% endblock %}

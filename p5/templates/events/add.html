@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add New Event</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="venue_id" class="form-label">Venue</label>
+        <select name="venue_id" id="venue_id" class="form-control" required>
+            <option value="">Select a venue</option>
+            {% for venue in venues %}
+            <option value="{{ venue.venue_id }}">{{ venue.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="customer_id" class="form-label">Customer</label>
+        <select name="customer_id" id="customer_id" class="form-control" required>
+            <option value="">Select a customer</option>
+            {% for customer in customers %}
+            <option value="{{ customer.customer_id }}">{{ customer.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" name="date" id="date" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="start_time" class="form-label">Start Time</label>
+        <input type="time" name="start_time" id="start_time" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="end_time" class="form-label">End Time</label>
+        <input type="time" name="end_time" id="end_time" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="number_of_guests" class="form-label">Number of Guests</label>
+        <input type="number" name="number_of_guests" id="number_of_guests" class="form-control" required min="1">
+    </div>
+
+    <div class="mb-3">
+        <label for="event_type" class="form-label">Party Type</label>
+        <select name="event_type" id="event_type" class="form-control" required>
+            <option value="">Select party type</option>
+            <option value="Graduation">Graduation</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Quinceañera">Quinceañera</option>
+            <option value="Holiday">Holiday</option>
+            <option value="Baby Shower">Baby Shower</option>
+            <option value="Anniversary">Anniversary</option>
+            <option value="Misc">Misc</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="party_description" class="form-label">Party Description</label>
+        <textarea name="party_description" id="party_description" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Event</button>
+    <a href="/events" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
