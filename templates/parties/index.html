@@ -7,36 +7,38 @@
     <a href="/parties/add" class="btn btn-primary">Add New Party</a>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Venue</th>
-            <th>Customer</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Guests of Honor</th>
-            <th>Decorations</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for party in parties %}
-        <tr>
-            <td>{{ party.date }}</td>
-            <td>{{ party.venue_name }}</td>
-            <td>{{ party.customer_name }}</td>
-            <td>{{ party.type }}</td>
-            <td>{{ party.description or 'N/A' }}</td>
-            <td>{{ party.guests_of_honor or 'N/A' }}</td>
-            <td>{{ party.decorations or 'N/A' }}</td>
-            <td>
-                <a href="/parties/{{ party.booking_id }}/{{ party.party_id }}/edit" class="btn btn-primary">Edit</a>
-                <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure you want to delete this party?')) document.getElementById('delete-form-{{ party.party_id }}').submit();">Delete</button>
-                <form id="delete-form-{{ party.party_id }}" action="/parties/{{ party.booking_id }}/{{ party.party_id }}/delete" method="POST" style="display: none;"></form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table" style="min-width: 100%">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Guests of Honor</th>
+                <th>Decorations</th>
+                <th style="min-width: 160px">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for party in parties %}
+            <tr>
+                <td>{{ party.date }}</td>
+                <td>{{ party.venue_name }}</td>
+                <td>{{ party.customer_name }}</td>
+                <td>{{ party.type }}</td>
+                <td>{{ party.description or 'N/A' }}</td>
+                <td>{{ party.guests_of_honor or 'N/A' }}</td>
+                <td>{{ party.decorations or 'N/A' }}</td>
+                <td>
+                    <a href="/parties/{{ party.booking_id }}/{{ party.party_id }}/edit" class="btn btn-sm btn-primary">Edit</a>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="if(confirm('Are you sure you want to delete this party?')) document.getElementById('delete-form-{{ party.party_id }}').submit();">Delete</button>
+                    <form id="delete-form-{{ party.party_id }}" action="/parties/{{ party.booking_id }}/{{ party.party_id }}/delete" method="POST" style="display: none;"></form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
