@@ -97,10 +97,8 @@ async def events_add(
             FROM reservation 
             WHERE venue_id = :venue_id 
             AND date = :date 
-            AND (
-                (start_time, end_time) OVERLAPS 
-                (:start_time::time, :end_time::time)
-            )
+            AND (start_time, end_time) OVERLAPS 
+                (CAST(:start_time AS TIME), CAST(:end_time AS TIME))
         """)
         if session.execute(conflict_check, {
             "venue_id": venue_id,
@@ -248,10 +246,8 @@ async def events_edit(
             WHERE venue_id = :venue_id 
             AND date = :date 
             AND booking_id != :booking_id
-            AND (
-                (start_time, end_time) OVERLAPS 
-                (:start_time::time, :end_time::time)
-            )
+            AND (start_time, end_time) OVERLAPS 
+                (CAST(:start_time AS TIME), CAST(:end_time AS TIME))
         """)
         if session.execute(conflict_check, {
             "venue_id": venue_id,
