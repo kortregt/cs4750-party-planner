@@ -14,6 +14,6 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 metadata = MetaData()
-table_staff = Table('Staff', metadata, autoload_with=engine)
-table_venue = Table('Venue', metadata, autoload_with=engine)
-table_reservation = Table('Reservation', metadata, autoload_with=engine)
+table_staff = Table('staff', metadata, autoload_with=engine)
+table_venue = Table('venue', metadata, autoload_with=engine)
+table_reservation = Table('reservation', metadata, autoload_with=engine)
