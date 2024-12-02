@@ -356,25 +356,41 @@ async def events_delete(request: Request, booking_id: int):
         party = party_result.fetchone()
         
         if party:
-            # Delete decorations first
-            decorations_query = text("""
-                DELETE FROM "Party_Decorations" 
+            # Check and delete decorations if they exist
+            decorations_check = text("""
+                SELECT 1 FROM "Party_Decorations" 
                 WHERE booking_id = :booking_id AND party_id = :party_id
             """)
-            session.execute(decorations_query, {
+            if session.execute(decorations_check, {
                 "booking_id": booking_id,
                 "party_id": party.party_id
-            })
+            }).scalar():
+                decorations_query = text("""
+                    DELETE FROM "Party_Decorations" 
+                    WHERE booking_id = :booking_id AND party_id = :party_id
+                """)
+                session.execute(decorations_query, {
+                    "booking_id": booking_id,
+                    "party_id": party.party_id
+                })
             
-            # Delete guests of honor
-            guests_query = text("""
-                DELETE FROM "Party_GuestOfHonor" 
+            # Check and delete guests of honor if they exist
+            guests_check = text("""
+                SELECT 1 FROM "Party_GuestOfHonor" 
                 WHERE booking_id = :booking_id AND party_id = :party_id
             """)
-            session.execute(guests_query, {
+            if session.execute(guests_check, {
                 "booking_id": booking_id,
                 "party_id": party.party_id
-            })
+            }).scalar():
+                guests_query = text("""
+                    DELETE FROM "Party_GuestOfHonor" 
+                    WHERE booking_id = :booking_id AND party_id = :party_id
+                """)
+                session.execute(guests_query, {
+                    "booking_id": booking_id,
+                    "party_id": party.party_id
+                })
             
             # Delete party
             delete_party_query = text("""
