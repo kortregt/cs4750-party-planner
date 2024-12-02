@@ -66,18 +66,13 @@ async def root():
 
 
 #this method doesn't work, the entire thing doesn't build if I use this.
-'''
-@app.get("/login")
-async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
-    return """
-        <html>
-        <body>
-        hello {} your email is {}
-        </body>
-        </html>
-    """.format(customer_name, customer_email)
+#https://www.youtube.com/watch?v=C386XOQLvjA
 
-'''
+@app.post("/login")
+async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
+    return {"Customer's Name": customer_name, "Customer's email": customer_email}
+
+
 
 @app.get("/venues", response_class=HTMLResponse)
 async def list_venues():
