@@ -11,17 +11,21 @@ def get_all_events():
     session = SessionLocal()
     try:
         query = """
-            SELECT r.booking_id, r.date, r.start_time, r.end_time,
-                   v.name as venue_name, p.type as event_type,
-                   c.name as customer_name
+            SELECT 
+                to_char(r.date, 'YYYY-MM-DD') as date,
+                to_char(r.start_time, 'HH24:MI') as start_time,
+                to_char(r.end_time, 'HH24:MI') as end_time,
+                v.name as venue_name,
+                p.type as event_type,
+                c.name as customer_name
             FROM reservation r
             JOIN venue v ON r.venue_id = v.venue_id
             LEFT JOIN party p ON r.booking_id = p.booking_id
             JOIN customer c ON r.customer_id = c.customer_id
         """
         result = session.execute(text(query))
-        events = result.fetchall()
-        return {"events": [dict(row) for row in events]}
+        events = [dict(zip(row.keys(), row)) for row in result]
+        return {"events": events}
     finally:
         session.close()
 
