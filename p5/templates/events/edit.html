@@ -47,14 +47,24 @@
     </div>
 
     <div class="mb-3">
-        <label for="event_type" class="form-label">Event Type</label>
+        <label for="event_type" class="form-label">Party Type</label>
         <select name="event_type" id="event_type" class="form-control" required>
-            <option value="">Select event type</option>
-            <option value="Birthday" {% if event.event_type == 'Birthday' %}selected{% endif %}>Birthday</option>
+            <option value="">Select party type</option>
+            <option value="Graduation" {% if event.event_type == 'Graduation' %}selected{% endif %}>Graduation</option>
             <option value="Wedding" {% if event.event_type == 'Wedding' %}selected{% endif %}>Wedding</option>
             <option value="Corporate" {% if event.event_type == 'Corporate' %}selected{% endif %}>Corporate</option>
-            <option value="Other" {% if event.event_type == 'Other' %}selected{% endif %}>Other</option>
+            <option value="Birthday" {% if event.event_type == 'Birthday' %}selected{% endif %}>Birthday</option>
+            <option value="Quinceañera" {% if event.event_type == 'Quinceañera' %}selected{% endif %}>Quinceañera</option>
+            <option value="Holiday" {% if event.event_type == 'Holiday' %}selected{% endif %}>Holiday</option>
+            <option value="Baby Shower" {% if event.event_type == 'Baby Shower' %}selected{% endif %}>Baby Shower</option>
+            <option value="Anniversary" {% if event.event_type == 'Anniversary' %}selected{% endif %}>Anniversary</option>
+            <option value="Misc" {% if event.event_type == 'Misc' %}selected{% endif %}>Misc</option>
         </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="party_description" class="form-label">Party Description</label>
+        <textarea name="party_description" id="party_description" class="form-control" rows="3" required>{{ event.party_description }}</textarea>
     </div>
 
     <button type="submit" class="btn btn-primary">Update Event</button>
