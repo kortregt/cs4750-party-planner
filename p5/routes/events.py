@@ -350,13 +350,45 @@ async def events_edit(
 async def events_delete(request: Request, booking_id: int):
     session = SessionLocal()
     try:
-        # Delete party first (if exists) due to foreign key constraint
-        party_query = text("DELETE FROM party WHERE booking_id = :booking_id")
-        session.execute(party_query, {"booking_id": booking_id})
+        # Get party_id first
+        party_query = text("SELECT party_id FROM party WHERE booking_id = :booking_id")
+        party_result = session.execute(party_query, {"booking_id": booking_id})
+        party = party_result.fetchone()
         
-        # Then delete reservation
-        query = text("DELETE FROM reservation WHERE booking_id = :booking_id")
-        result = session.execute(query, {"booking_id": booking_id})
+        if party:
+            # Delete decorations first
+            decorations_query = text("""
+                DELETE FROM party_decoration 
+                WHERE booking_id = :booking_id AND party_id = :party_id
+            """)
+            session.execute(decorations_query, {
+                "booking_id": booking_id,
+                "party_id": party.party_id
+            })
+            
+            # Delete guests of honor
+            guests_query = text("""
+                DELETE FROM party_guestofhonor 
+                WHERE booking_id = :booking_id AND party_id = :party_id
+            """)
+            session.execute(guests_query, {
+                "booking_id": booking_id,
+                "party_id": party.party_id
+            })
+            
+            # Delete party
+            delete_party_query = text("""
+                DELETE FROM party 
+                WHERE booking_id = :booking_id AND party_id = :party_id
+            """)
+            session.execute(delete_party_query, {
+                "booking_id": booking_id,
+                "party_id": party.party_id
+            })
+        
+        # Finally delete reservation
+        reservation_query = text("DELETE FROM reservation WHERE booking_id = :booking_id")
+        result = session.execute(reservation_query, {"booking_id": booking_id})
         
         session.commit()
         
