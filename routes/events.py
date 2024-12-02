@@ -70,7 +70,8 @@ async def events_add(
     end_time: str = Form(...),
     number_of_guests: int = Form(...),
     customer_id: int = Form(...),
-    event_type: str = Form(...)
+    event_type: str = Form(...),
+    party_description: str = Form(...)
 ):
     session = SessionLocal()
     try:
@@ -128,29 +129,28 @@ async def events_add(
         )
         booking_id = result.scalar()
         
-        # Add party if type is provided
-        if event_type:
-            # First get the next party_id for this booking
-            party_id_query = text("""
-                SELECT COALESCE(MAX(party_id), 0) + 1 
-                FROM party 
-                WHERE booking_id = :booking_id
-            """)
-            party_id = session.execute(party_id_query, {"booking_id": booking_id}).scalar()
+        # Get next party_id
+        party_id_query = text("""
+            SELECT COALESCE(MAX(party_id), 0) + 1 
+            FROM party 
+            WHERE booking_id = :booking_id
+        """)
+        party_id = session.execute(party_id_query, {"booking_id": booking_id}).scalar()
 
-            # Then insert the party
-            party_query = text("""
-                INSERT INTO party (booking_id, party_id, type)
-                VALUES (:booking_id, :party_id, :type)
-            """)
-            session.execute(
-                party_query,
-                {
-                    "booking_id": booking_id,
-                    "party_id": party_id,
-                    "type": event_type
-                }
-            )
+        # Insert party
+        party_query = text("""
+            INSERT INTO party (booking_id, party_id, type, description)
+            VALUES (:booking_id, :party_id, :type, :description)
+        """)
+        session.execute(
+            party_query,
+            {
+                "booking_id": booking_id,
+                "party_id": party_id,
+                "type": event_type,
+                "description": party_description
+            }
+        )
         
         session.commit()
         return RedirectResponse(url="/events", status_code=303)
@@ -178,7 +178,8 @@ async def events_edit_form(request: Request, booking_id: int):
                 to_char(r.end_time, 'HH24:MI') as end_time,
                 r.number_of_guests,
                 p.type as event_type,
-                p.party_id
+                p.party_id,
+                p.description as party_description
             FROM reservation r
             LEFT JOIN party p ON r.booking_id = p.booking_id
             WHERE r.booking_id = :booking_id
@@ -218,7 +219,8 @@ async def events_edit(
     end_time: str = Form(...),
     number_of_guests: int = Form(...),
     customer_id: int = Form(...),
-    event_type: str = Form(...)
+    event_type: str = Form(...),
+    party_description: str = Form(...)
 ):
     session = SessionLocal()
     try:
@@ -283,52 +285,54 @@ async def events_edit(
             }
         )
         
-        if event_type:
-            # Check if party exists for this booking
-            check_party_query = text("""
-                SELECT party_id FROM party 
+        # Check if party exists for this booking
+        check_party_query = text("""
+            SELECT party_id FROM party 
+            WHERE booking_id = :booking_id
+        """)
+        party_result = session.execute(check_party_query, {"booking_id": booking_id})
+        existing_party = party_result.fetchone()
+
+        if existing_party:
+            # Update existing party
+            party_query = text("""
+                UPDATE party 
+                SET type = :type,
+                    description = :description
+                WHERE booking_id = :booking_id AND party_id = :party_id
+            """)
+            session.execute(
+                party_query,
+                {
+                    "booking_id": booking_id,
+                    "party_id": existing_party.party_id,
+                    "type": event_type,
+                    "description": party_description
+                }
+            )
+        else:
+            # Get next party_id
+            party_id_query = text("""
+                SELECT COALESCE(MAX(party_id), 0) + 1 
+                FROM party 
                 WHERE booking_id = :booking_id
             """)
-            party_result = session.execute(check_party_query, {"booking_id": booking_id})
-            existing_party = party_result.fetchone()
+            party_id = session.execute(party_id_query, {"booking_id": booking_id}).scalar()
 
-            if existing_party:
-                # Update existing party
-                party_query = text("""
-                    UPDATE party 
-                    SET type = :type
-                    WHERE booking_id = :booking_id AND party_id = :party_id
-                """)
-                session.execute(
-                    party_query,
-                    {
-                        "booking_id": booking_id,
-                        "party_id": existing_party.party_id,
-                        "type": event_type
-                    }
-                )
-            else:
-                # Get next party_id for this booking
-                party_id_query = text("""
-                    SELECT COALESCE(MAX(party_id), 0) + 1 
-                    FROM party 
-                    WHERE booking_id = :booking_id
-                """)
-                party_id = session.execute(party_id_query, {"booking_id": booking_id}).scalar()
-
-                # Create new party
-                party_query = text("""
-                    INSERT INTO party (booking_id, party_id, type)
-                    VALUES (:booking_id, :party_id, :type)
-                """)
-                session.execute(
-                    party_query,
-                    {
-                        "booking_id": booking_id,
-                        "party_id": party_id,
-                        "type": event_type
-                    }
-                )
+            # Create new party
+            party_query = text("""
+                INSERT INTO party (booking_id, party_id, type, description)
+                VALUES (:booking_id, :party_id, :type, :description)
+            """)
+            session.execute(
+                party_query,
+                {
+                    "booking_id": booking_id,
+                    "party_id": party_id,
+                    "type": event_type,
+                    "description": party_description
+                }
+            )
         
         session.commit()
         return RedirectResponse(url="/events", status_code=303)

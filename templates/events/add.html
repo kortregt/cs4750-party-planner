@@ -45,14 +45,24 @@
     </div>
 
     <div class="mb-3">
-        <label for="event_type" class="form-label">Event Type</label>
+        <label for="event_type" class="form-label">Party Type</label>
         <select name="event_type" id="event_type" class="form-control" required>
-            <option value="">Select event type</option>
-            <option value="Birthday">Birthday</option>
+            <option value="">Select party type</option>
+            <option value="Graduation">Graduation</option>
             <option value="Wedding">Wedding</option>
             <option value="Corporate">Corporate</option>
-            <option value="Other">Other</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Quinceañera">Quinceañera</option>
+            <option value="Holiday">Holiday</option>
+            <option value="Baby Shower">Baby Shower</option>
+            <option value="Anniversary">Anniversary</option>
+            <option value="Misc">Misc</option>
         </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="party_description" class="form-label">Party Description</label>
+        <textarea name="party_description" id="party_description" class="form-control" rows="3" required></textarea>
     </div>
 
     <button type="submit" class="btn btn-primary">Add Event</button>
