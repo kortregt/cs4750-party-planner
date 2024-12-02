@@ -1,9 +1,13 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, JSONResponse
-from database import engine
-from sqlalchemy import text
+from fastapi.responses import HTMLResponse
+from routes import staff, venues, events, functions
 
 app = FastAPI()
+
+app.include_router(staff.router)
+app.include_router(venues.router)
+app.include_router(events.router)
+app.include_router(functions.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -14,6 +18,7 @@ async def root():
             <ul>
                 <li><a href="/venues">View Venues</a></li>
                 <li><a href="/events">View Events</a></li>
+                <li><a href="/staff">View Staff</a></li>
             </ul>
         </body>
     </html>
@@ -27,7 +32,6 @@ async def list_venues():
             result = conn.execute(text(query))
             venues = result.fetchall()
 
-        # Build simple HTML table
         venue_rows = ""
         for venue in venues:
             venue_rows += f"<tr><td>{venue.name}</td><td>{venue.location}</td><td>${venue.cost}</td><td>{venue.max_capacity}</td></tr>"
@@ -66,7 +70,6 @@ async def list_events():
             result = conn.execute(text(query))
             events = result.fetchall()
 
-        # Build simple HTML table
         event_rows = ""
         for event in events:
             event_rows += f"<tr><td>{event.date}</td><td>{event.venue}</td><td>{event.event_type or 'N/A'}</td></tr>"
