@@ -1,41 +1,28 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-lg mx-auto">
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">Add Customer</h1>
-        
-        <form action="/customers/add" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
-                    Name
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="name" name="name" type="text" required>
+<h1>Add Customer</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form action="/customers/add" method="POST" class="mb-4">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
             </div>
             
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="phone_number">
-                    Phone Number
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="phone_number" name="phone_number" type="tel" required>
+            <div class="mb-3">
+                <label for="phone_number" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
             </div>
             
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-                    Email
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="email" name="email" type="email" required>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
             
-            <div class="flex items-center justify-between">
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    type="submit">
-                    Add Customer
-                </button>
-                <a href="/customers" class="text-blue-500 hover:text-blue-800">Cancel</a>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Add Customer</button>
+                <a href="/customers" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
