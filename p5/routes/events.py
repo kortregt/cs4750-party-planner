@@ -358,7 +358,7 @@ async def events_delete(request: Request, booking_id: int):
         if party:
             # Check and delete decorations if they exist
             decorations_check = text("""
-                SELECT 1 FROM "Party_Decorations" 
+                SELECT 1 FROM party_decorations 
                 WHERE booking_id = :booking_id AND party_id = :party_id
             """)
             if session.execute(decorations_check, {
@@ -366,7 +366,7 @@ async def events_delete(request: Request, booking_id: int):
                 "party_id": party.party_id
             }).scalar():
                 decorations_query = text("""
-                    DELETE FROM "Party_Decorations" 
+                    DELETE FROM party_decorations 
                     WHERE booking_id = :booking_id AND party_id = :party_id
                 """)
                 session.execute(decorations_query, {
@@ -376,7 +376,7 @@ async def events_delete(request: Request, booking_id: int):
             
             # Check and delete guests of honor if they exist
             guests_check = text("""
-                SELECT 1 FROM "Party_GuestOfHonor" 
+                SELECT 1 FROM party_guestofhonor 
                 WHERE booking_id = :booking_id AND party_id = :party_id
             """)
             if session.execute(guests_check, {
@@ -384,7 +384,7 @@ async def events_delete(request: Request, booking_id: int):
                 "party_id": party.party_id
             }).scalar():
                 guests_query = text("""
-                    DELETE FROM "Party_GuestOfHonor" 
+                    DELETE FROM party_guestofhonor 
                     WHERE booking_id = :booking_id AND party_id = :party_id
                 """)
                 session.execute(guests_query, {
