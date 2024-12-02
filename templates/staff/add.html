@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Add New Staff</h1>
+<form method="POST">
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Decorator">Decorator</option>
+            <option value="IT">IT</option>
+            <option value="Photography">Photography</option>
+            <option value="Cleaner">Cleaner</option>
+        </select>
+    </div>
+    <div>
+        <label for="wage">Wage:</label>
+        <input type="number" id="wage" name="wage" step="0.01" required>
+    </div>
+    <button type="submit">Add Staff</button>
+    <a href="/staff">Cancel</a>
+</form>
+{% endblock %}
