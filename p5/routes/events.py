@@ -350,7 +350,15 @@ async def events_edit(
 async def events_delete(request: Request, booking_id: int):
     session = SessionLocal()
     try:
-        # Delete party first (if exists) due to foreign key constraint
+        # Delete party_guestofhonor records first
+        guest_query = text("DELETE FROM party_guestofhonor WHERE booking_id = :booking_id")
+        session.execute(guest_query, {"booking_id": booking_id})
+        
+        # Delete party_decorations records
+        decorations_query = text("DELETE FROM party_decorations WHERE booking_id = :booking_id")
+        session.execute(decorations_query, {"booking_id": booking_id})
+        
+        # Delete party
         party_query = text("DELETE FROM party WHERE booking_id = :booking_id")
         session.execute(party_query, {"booking_id": booking_id})
         
