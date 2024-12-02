@@ -44,7 +44,7 @@ async def root():
             <tr>
             <tr> 
             	<td> <div class="loginblock">
-			<form action="/login" method="post">
+			<form action="/oldroot" method="get">
 			<br>
 			<label> Name: </label>
 			<input name="customer_name" type="text"/>
@@ -68,10 +68,10 @@ async def root():
 #this method doesn't work, the entire thing doesn't build if I use this.
 #https://www.youtube.com/watch?v=C386XOQLvjA
 
-@app.post("/login")
+'''@app.post("/login")
 async def login_customer(customer_name: str = Form(...), customer_email: str = Form(...)):
     return {"Customer's Name": customer_name, "Customer's email": customer_email}
-
+'''
 
 
 @app.get("/venues", response_class=HTMLResponse)
