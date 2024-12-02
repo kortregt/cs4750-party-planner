@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Request, HTTPException
 from sqlalchemy import select, text
 from database import SessionLocal, engine, table_venue
 from fastapi.responses import HTMLResponse
