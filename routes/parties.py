@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select, delete, update, text
 from database import SessionLocal
-from typing import Optional
+from typing import Optional, List
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -42,6 +42,158 @@ async def parties_list(request: Request):
         return templates.TemplateResponse(
             "parties/index.html",
             {"request": request, "parties": parties}
+        )
+    finally:
+        session.close()
+
+@router.get("/parties/add", response_class=HTMLResponse)
+async def parties_add_form(request: Request):
+    session = SessionLocal()
+    try:
+        # Get venues for dropdown
+        venues_query = text("SELECT venue_id, name FROM venue ORDER BY name")
+        venues = session.execute(venues_query).fetchall()
+        
+        # Get customers for dropdown
+        customers_query = text("SELECT customer_id, name FROM customer ORDER BY name")
+        customers = session.execute(customers_query).fetchall()
+        
+        return templates.TemplateResponse(
+            "parties/add.html",
+            {
+                "request": request,
+                "venues": venues,
+                "customers": customers
+            }
+        )
+    finally:
+        session.close()
+
+@router.post("/parties/add")
+async def parties_add(
+    request: Request,
+    venue_id: int = Form(...),
+    customer_id: int = Form(...),
+    date: str = Form(...),
+    start_time: str = Form(...),
+    end_time: str = Form(...),
+    number_of_guests: int = Form(...),
+    type: str = Form(...),
+    description: str = Form(None),
+    guest_names: str = Form(""),
+    decoration_descriptions: str = Form("")
+):
+    session = SessionLocal()
+    try:
+        # Validate venue exists
+        venue_check = text("SELECT 1 FROM venue WHERE venue_id = :venue_id")
+        if not session.execute(venue_check, {"venue_id": venue_id}).scalar():
+            raise HTTPException(status_code=400, detail="Invalid venue ID")
+
+        # Check venue capacity
+        capacity_check = text("""
+            SELECT max_capacity 
+            FROM venue 
+            WHERE venue_id = :venue_id AND max_capacity >= :guests
+        """)
+        if not session.execute(capacity_check, {
+            "venue_id": venue_id,
+            "guests": number_of_guests
+        }).scalar():
+            raise HTTPException(status_code=400, detail="Number of guests exceeds venue capacity")
+
+        # Check for scheduling conflicts
+        conflict_check = text("""
+            SELECT 1 
+            FROM reservation 
+            WHERE venue_id = :venue_id 
+            AND date = :date 
+            AND (start_time, end_time) OVERLAPS 
+                (CAST(:start_time AS TIME), CAST(:end_time AS TIME))
+        """)
+        if session.execute(conflict_check, {
+            "venue_id": venue_id,
+            "date": date,
+            "start_time": start_time,
+            "end_time": end_time
+        }).scalar():
+            raise HTTPException(status_code=400, detail="Time slot conflicts with existing reservation")
+
+        # Insert reservation
+        query = text("""
+            INSERT INTO reservation (venue_id, date, start_time, end_time, number_of_guests, customer_id)
+            VALUES (:venue_id, :date, :start_time, :end_time, :number_of_guests, :customer_id)
+            RETURNING booking_id
+        """)
+        
+        result = session.execute(
+            query,
+            {
+                "venue_id": venue_id,
+                "date": date,
+                "start_time": start_time,
+                "end_time": end_time,
+                "number_of_guests": number_of_guests,
+                "customer_id": customer_id
+            }
+        )
+        booking_id = result.scalar()
+        
+        # Get next party_id
+        party_id_query = text("""
+            SELECT COALESCE(MAX(party_id), 0) + 1 
+            FROM party 
+            WHERE booking_id = :booking_id
+        """)
+        party_id = session.execute(party_id_query, {"booking_id": booking_id}).scalar()
+
+        # Insert party
+        party_query = text("""
+            INSERT INTO party (booking_id, party_id, type, description)
+            VALUES (:booking_id, :party_id, :type, :description)
+        """)
+        session.execute(
+            party_query,
+            {
+                "booking_id": booking_id,
+                "party_id": party_id,
+                "type": type,
+                "description": description
+            }
+        )
+
+        # Insert guests of honor
+        if guest_names:
+            for name in guest_names.split('\n'):
+                if name.strip():
+                    session.execute(
+                        text("""
+                            INSERT INTO party_guestofhonor (booking_id, party_id, name)
+                            VALUES (:booking_id, :party_id, :name)
+                        """),
+                        {"booking_id": booking_id, "party_id": party_id, "name": name.strip()}
+                    )
+
+        # Insert decorations
+        if decoration_descriptions:
+            for desc in decoration_descriptions.split('\n'):
+                if desc.strip():
+                    session.execute(
+                        text("""
+                            INSERT INTO party_decorations (booking_id, party_id, description)
+                            VALUES (:booking_id, :party_id, :description)
+                        """),
+                        {"booking_id": booking_id, "party_id": party_id, "description": desc.strip()}
+                    )
+
+        session.commit()
+        return RedirectResponse(url="/parties", status_code=303)
+    except Exception as e:
+        session.rollback()
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "error": str(e)},
+            status_code=400
         )
     finally:
         session.close()
@@ -163,6 +315,44 @@ async def parties_edit(
                         {"booking_id": booking_id, "party_id": party_id, "description": description.strip()}
                     )
 
+        session.commit()
+        return RedirectResponse(url="/parties", status_code=303)
+    except Exception as e:
+        session.rollback()
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "error": str(e)},
+            status_code=400
+        )
+    finally:
+        session.close()
+
+@router.post("/parties/{booking_id}/{party_id}/delete")
+async def parties_delete(request: Request, booking_id: int, party_id: int):
+    session = SessionLocal()
+    try:
+        # Delete guests of honor and decorations first
+        session.execute(
+            text("DELETE FROM party_guestofhonor WHERE booking_id = :booking_id AND party_id = :party_id"),
+            {"booking_id": booking_id, "party_id": party_id}
+        )
+        session.execute(
+            text("DELETE FROM party_decorations WHERE booking_id = :booking_id AND party_id = :party_id"),
+            {"booking_id": booking_id, "party_id": party_id}
+        )
+        
+        # Delete party
+        session.execute(
+            text("DELETE FROM party WHERE booking_id = :booking_id AND party_id = :party_id"),
+            {"booking_id": booking_id, "party_id": party_id}
+        )
+        
+        # Delete reservation
+        session.execute(
+            text("DELETE FROM reservation WHERE booking_id = :booking_id"),
+            {"booking_id": booking_id}
+        )
+        
         session.commit()
         return RedirectResponse(url="/parties", status_code=303)
     except Exception as e:

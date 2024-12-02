@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add New Party</h1>
+
+<form method="POST" action="/parties/add">
+    <div class="mb-3">
+        <label for="venue" class="form-label">Venue</label>
+        <select name="venue_id" id="venue" class="form-select" required>
+            <option value="">Select a venue</option>
+            {% for venue in venues %}
+            <option value="{{ venue.venue_id }}">{{ venue.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="customer" class="form-label">Customer</label>
+        <select name="customer_id" id="customer" class="form-select" required>
+            <option value="">Select a customer</option>
+            {% for customer in customers %}
+            <option value="{{ customer.customer_id }}">{{ customer.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" id="date" name="date" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="start_time" class="form-label">Start Time</label>
+        <input type="time" class="form-control" id="start_time" name="start_time" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="end_time" class="form-label">End Time</label>
+        <input type="time" class="form-control" id="end_time" name="end_time" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="number_of_guests" class="form-label">Number of Guests</label>
+        <input type="number" class="form-control" id="number_of_guests" name="number_of_guests" required min="1">
+    </div>
+
+    <div class="mb-3">
+        <label for="type" class="form-label">Party Type</label>
+        <input type="text" class="form-control" id="type" name="type" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="guests_of_honor" class="form-label">Guests of Honor (one per line)</label>
+        <textarea class="form-control" id="guests_of_honor" name="guest_names" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="decorations" class="form-label">Decorations (one per line)</label>
+        <textarea class="form-control" id="decorations" name="decoration_descriptions" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Party</button>
+</form>
+{% endblock %}
